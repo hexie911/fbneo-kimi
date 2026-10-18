@@ -1,0 +1,18 @@
+--- a/src/intf/video/vid_interface.cpp
++++ b/src/intf/video/vid_interface.cpp
+@@ -20,6 +20,8 @@
+ #elif defined (BUILD_QT)
+     extern struct VidOut VidOutOGL;
++#elif defined (BUILD_ANDROID)
++extern struct VidOut VidOutAndroid;
+ #endif
+ 
+ static struct VidOut *pVidOut[] = {
+@@ -43,6 +45,8 @@
+ #elif defined (BUILD_QT)
+     &VidOutOGL,
++#elif defined (BUILD_ANDROID)
++	&VidOutAndroid,
+ #endif
+ };
+ 
