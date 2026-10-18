@@ -1,0 +1,11 @@
+--- a/src/burner/burner.h
++++ b/src/burner/burner.h
+@@ -57,6 +57,8 @@
+ #elif defined(__LIBRETRO__)
+ #include "burner_libretro.h"
+ #elif defined(BUILD_QT)
+  #include "burner_qt.h"
++#elif defined (BUILD_ANDROID)
++ #include "burner_android.h"
+ #endif
+ 
