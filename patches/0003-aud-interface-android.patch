@@ -1,0 +1,22 @@
+--- a/src/intf/audio/aud_interface.cpp
++++ b/src/intf/audio/aud_interface.cpp
+@@ -28,6 +28,8 @@
+ #ifdef BUILD_QT_LINUX
+     extern struct AudOut AudOutPulseSimple;
+ #endif
++#elif defined (BUILD_ANDROID)
++extern struct AudOut AudOutAndroid;
+     extern struct AudOut AudOutQtSound;
+ #endif
+ 
+@@ -45,6 +47,8 @@
+ #elif defined (BUILD_QT)
+ #ifdef BUILD_QT_LINUX
+     &AudOutPulseSimple,
++#endif
++#elif defined (BUILD_ANDROID)
++	&AudOutAndroid,
+ #endif
+     &AudOutQtSound,
+ #endif
+ };
