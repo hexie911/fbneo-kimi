@@ -1,0 +1,55 @@
+name: Build FBNeo Android APK
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch FBNeo source
+        run: |
+          git clone --depth 1 https://github.com/finalburnneo/FBNeo.git third_party/FBNeo
+          echo "FBNeo commit: $(git -C third_party/FBNeo rev-parse HEAD)"
+
+      - name: Apply Android patches
+        run: |
+          for p in patches/*.patch; do
+            echo "=== Applying $p ==="
+            patch -p1 -d third_party/FBNeo < "$p" || { echo "PATCH FAILED: $p (FBNeo may have drifted)"; exit 1; }
+          done
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Install SDK/NDK components
+        run: |
+          yes | sdkmanager --licenses > /dev/null
+          sdkmanager "platforms;android-34" "build-tools;34.0.0" "ndk;26.1.10909125"
+
+      - name: Install Gradle 8.9
+        run: |
+          wget -q https://services.gradle.org/distributions/gradle-8.9-bin.zip
+          unzip -q gradle-8.9-bin.zip
+
+      - name: Build APK
+        env:
+          FBNEO_DIR: ${{ github.workspace }}/third_party/FBNeo
+        run: |
+          ./gradle-8.9/bin/gradle :app:assembleDebug \
+            -PfbneoDir="$FBNEO_DIR" \
+            -Dorg.gradle.daemon=false \
+            --stacktrace
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: fbneo-android-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+          
