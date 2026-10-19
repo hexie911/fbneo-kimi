@@ -26,6 +26,7 @@ extern "C" {
     void   Android_VideoCopyFrame(UINT8*);
     void   Android_VideoGetSize(INT32*, INT32*);
     void   Android_SetInputState(INT32, INT32, INT32);
+    void   Android_SetLastError(const char*);
     const char* Android_GetLastError();
     void   InitSupportPaths(const char*);
 }
