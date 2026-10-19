@@ -16,10 +16,53 @@ jobs:
 
       - name: Apply Android patches
         run: |
-          for p in patches/*.patch; do
-            echo "=== Applying $p ==="
-            patch -p1 -d third_party/FBNeo < "$p" || { echo "PATCH FAILED: $p (FBNeo may have drifted)"; exit 1; }
-          done
+          python3 - <<'PYEOF'
+          import sys, pathlib
+          FB = pathlib.Path("third_party/FBNeo")
+
+          def patch_file(rel, subs):
+              p = FB / rel
+              s = p.read_text()
+              for old, new in subs:
+                  if new in s:
+                      print("[skip] " + rel + ": already applied")
+                      continue
+                  n = s.count(old)
+                  if n != 1:
+                      print("[FAIL] " + rel + ": anchor found " + str(n) + "x: " + repr(old[:70]))
+                      sys.exit(1)
+                  s = s.replace(old, new)
+                  print("[ok] " + rel)
+              p.write_text(s)
+
+          patch_file("src/burner/burner.h", [
+              ('#elif defined(BUILD_QT)\n #include "burner_qt.h"\n#endif',
+               '#elif defined(BUILD_QT)\n #include "burner_qt.h"\n#elif defined (BUILD_ANDROID)\n #include "burner_android.h"\n#endif'),
+          ])
+
+          patch_file("src/intf/video/vid_interface.cpp", [
+              ('    extern struct VidOut VidOutOGL;\n#endif',
+               '    extern struct VidOut VidOutOGL;\n#elif defined (BUILD_ANDROID)\nextern struct VidOut VidOutAndroid;\n#endif'),
+              ('    &VidOutOGL,\n#endif',
+               '    &VidOutOGL,\n#elif defined (BUILD_ANDROID)\n\t&VidOutAndroid,\n#endif'),
+          ])
+
+          patch_file("src/intf/audio/aud_interface.cpp", [
+              ('    extern struct AudOut AudOutQtSound;\n#endif',
+               '    extern struct AudOut AudOutQtSound;\n#elif defined (BUILD_ANDROID)\nextern struct AudOut AudOutAndroid;\n#endif'),
+              ('    &AudOutQtSound,\n#endif',
+               '    &AudOutQtSound,\n#elif defined (BUILD_ANDROID)\n\t&AudOutAndroid,\n#endif'),
+          ])
+
+          patch_file("src/intf/input/inp_interface.cpp", [
+              ('\textern struct InputInOut InputInOutQt;\n#endif',
+               '\textern struct InputInOut InputInOutQt;\n#elif defined (BUILD_ANDROID)\nextern struct InputInOut InputInOutAndroid;\n#endif'),
+              ('\t&InputInOutQt,\n#endif',
+               '\t&InputInOutQt,\n#elif defined (BUILD_ANDROID)\n\t&InputInOutAndroid,\n#endif'),
+          ])
+
+          print("All Android patches applied.")
+          PYEOF
 
       - uses: actions/setup-java@v4
         with:
@@ -52,4 +95,3 @@ jobs:
         with:
           name: fbneo-android-apk
           path: app/build/outputs/apk/debug/app-debug.apk
-          
