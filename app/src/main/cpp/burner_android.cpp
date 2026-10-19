@@ -15,16 +15,13 @@ bool  bAppDoFast = false;
 bool  bAppFullscreen = false;
 bool  bAlwaysProcessKeyboardInput = false;
 TCHAR szAppBurnVer[16] = _T("1.0.0.3");
+INT32 bBurnerVerbose = 0;
 INT32 bCheatsAllowed = 1;
 INT32 bDrvSaveAll = 0;
 INT32 EnableHiscores = 1;
 INT32 nReplayStatus = 0;
 INT32 bReplayReadOnly = 0;
 UINT32 nStartFrame = 0;
-bool  bResetDrv = false;
-
-INT32 nAnalogSpeed = 0x0100;
-INT32 nFireButtons = 0;
 
 char szAppRomPaths[DIRS_MAX][MAX_PATH] = { { "" }, };
 
@@ -100,6 +97,7 @@ void InitSupportPaths(const char* filesDir)
 INT32 StopReplay() { return 0; }
 void SetPauseMode(INT32 bPause) { bRunPause = (bPause != 0); }
 void EmulatorAppDoFast(bool dofast) { bAppDoFast = dofast; }
+void StartFromReset(TCHAR*, bool) { }
 
 char* GetSavestateFilename(int nSlot)
 {
