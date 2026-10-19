@@ -4,6 +4,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+// defined in intf/audio/aud_interface.cpp (no public header)
+extern INT32 nAudSampleRate[8];
+extern INT32 nAudSegLen;
+extern INT32 nAudAllocSegLen;
+extern INT16* nAudNextSound;
+extern UINT32 nAudSelect;
+
 #define RING_FRAMES (1 << 15)
 
 static INT16 sRing[RING_FRAMES * 2];
