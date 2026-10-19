@@ -7,6 +7,18 @@
 
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, "FBNeo", __VA_ARGS__)
 
+// defined in intf/video/vid_interface.cpp (no public header)
+extern UINT8* pVidImage;
+extern INT32 pVidImageSize;
+extern INT32 nVidImageWidth;
+extern INT32 nVidImageHeight;
+extern INT32 nVidImageLeft;
+extern INT32 nVidImageTop;
+extern INT32 nVidImagePitch;
+extern INT32 nVidImageBPP;
+extern INT32 nVidImageDepth;
+extern UINT32 (__cdecl *VidHighCol)(INT32 r, INT32 g, INT32 b, INT32 i);
+
 static UINT8* sFront = NULL;
 static INT32  sW = 0, sH = 0;
 static pthread_mutex_t sLock = PTHREAD_MUTEX_INITIALIZER;
